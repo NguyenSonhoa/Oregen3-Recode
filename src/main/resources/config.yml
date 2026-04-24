@@ -1,0 +1,316 @@
+# -------------------------------------
+# Configuration link: https://github.com/xHexed/Oregen3/blob/master/src/main/resources/config.yml
+# Please click this link if you use the plugin the first time or updating from an old version
+# -------------------------------------
+mode:
+  waterBlock: true
+  lavaBlock: false
+  waterLava: true
+
+# Danh sách các khối làm giá đỡ để tạo quặng (Hàng rào, sắt, ...)
+blocks:
+- FENCE
+- OAK_FENCE
+- ACACIA_FENCE
+- BIRCH_FENCE
+- DARK_OAK_FENCE
+- JUNGLE_FENCE
+- SPRUCE_FENCE
+- IRON_FENCE
+- NETHER_FENCE
+- COBBLESTONE_WALL
+- MOSS_COBBLESTONE_WALL
+
+# Hiển thị tên quặng tùy chỉnh trong GUI nâng cấp
+material-display:
+  COBBLESTONE: "&7Đá Cuội"
+  COAL_ORE: "&0Quặng Than"
+  IRON_ORE: "&fQuặng Sắt"
+  GOLD_ORE: "&eQuặng Vàng"
+  LAPIS_ORE: "&9Quặng Thanh Kim"
+  DIAMOND_ORE: "&bQuặng Kim Cương"
+  EMERALD_ORE: "&aQuặng Lục Bảo"
+  COAL_BLOCK: "&8Khối Than"
+  IRON_BLOCK: "&fKhối Sắt"
+  GOLD_BLOCK: "&eKhối Vàng"
+  DIAMOND_BLOCK: "&bKhối Kim Cương"
+  EMERALD_BLOCK: "&aKhối Lục Bảo"
+  NETHERITE_INGOT: "&4Phôi Netherite"
+  NETHERITE_BLOCK: "&4Khối Netherite"
+  BEACON: "&fĐèn Hiệu"
+  NETHER_STAR: "&eSao Địa Ngục"
+
+# The plugin will try to find a skyblock plugin to enable owner's permission feature
+enableDependency: true
+defaultGenerator: default
+# Adds a check to prevent placing blocks on non-air blocks
+preventOverrideBlocks: false
+
+hooks:
+  skyblock:
+    getGeneratorMode: owner
+    ignoreOfflinePlayers: false
+  Vault:
+    forceAsync: false
+    pluginAsyncList:
+    - LuckPerms
+
+global:
+  useJavaAsyncScheduler: false
+  listener:
+    asyncListener: false
+  generators:
+    check-regen:
+      enabled: true
+      mode:
+        waterBlock: 0
+        lavaBlock: 0
+        waterLava: 0
+    world:
+      enabled: false
+      blacklist: true
+      list:
+      - world1
+      - world2
+    sound:
+      enabled: true
+      name: BLOCK_FIRE_EXTINGUISH
+      volume: 1
+      pitch: 1
+    maxBlockPlacePerTick: 0
+
+generators:
+  default:
+    name: "Tier 0"
+    priority: 0
+    random:
+      COBBLESTONE: 100.0
+  tier1:
+    name: "Tier 1"
+    permission: oregen3.tier.1
+    realm-required: 2
+    priority: 1
+    random:
+      COBBLESTONE: 60.0
+      COAL_ORE: 25.0
+      IRON_ORE: 10.0
+      GOLD_ORE: 5.0
+    drops:
+      replace: false # Nếu true, quặng sẽ không rơi ra block/vật phẩm vanilla nữa
+      items:
+        mmoitems-MATERIAL:DEOBTGI: 10.0
+        COAL: 5.0
+  tier2:
+    name: "Tier 2"
+    permission: oregen3.tier.2
+    realm-required: 2
+    priority: 2
+    random:
+      COBBLESTONE: 40.0
+      IRON_ORE: 25.0
+      GOLD_ORE: 15.0
+      LAPIS_ORE: 10.0
+      DIAMOND_ORE: 5.0
+      EMERALD_ORE: 5.0
+  tier3:
+    name: "Tier 3"
+    permission: oregen3.tier.3
+    realm-required: 2
+    priority: 3
+    random:
+      IRON_ORE: 20.0
+      GOLD_ORE: 15.0
+      DIAMOND_ORE: 15.0
+      EMERALD_ORE: 10.0
+      COAL_BLOCK: 20.0
+      IRON_BLOCK: 10.0
+      GOLD_BLOCK: 10.0
+  tier4:
+    name: "Tier 4"
+    permission: oregen3.tier.4
+    realm-required: 2
+    priority: 4
+    random:
+      DIAMOND_ORE: 15.0
+      EMERALD_ORE: 10.0
+      GOLD_BLOCK: 25.0
+      IRON_BLOCK: 15.0
+      DIAMOND_BLOCK: 15.0
+      EMERALD_BLOCK: 10.0
+      NETHERITE_BLOCK: 10.0 # Changed from NETHERITE_INGOT (not a block)
+  tier5:
+    name: "Tier 5"
+    permission: oregen3.tier.5
+    realm-required: 2
+    priority: 5
+    random:
+      GOLD_BLOCK: 30.0
+      IRON_BLOCK: 20.0
+      DIAMOND_BLOCK: 15.0
+      EMERALD_BLOCK: 15.0
+      NETHERITE_BLOCK: 10.0
+      BEACON: 10.0
+  tier6:
+    name: "Tier 6"
+    permission: oregen3.tier.6
+    realm-required: 2
+    priority: 6
+    random:
+      DIAMOND_BLOCK: 30.0
+      EMERALD_BLOCK: 30.0
+      NETHERITE_BLOCK: 35.0
+    drops:
+      replace: false # Nếu true, quặng sẽ không rơi ra block/vật phẩm vanilla nữa
+      items:
+        mmoitems-MATERIAL:STEEL_INGOT: 100
+
+messages:
+  prefix: '&f[&6OreGen&e3&f]'
+  noIsland: "&cBạn phải đứng trên đảo để sử dụng tính năng này."
+  noPermission: "&4Thiếu quyền hạn: &c %perm%"
+  notPlayer: "&4Chỉ người chơi mới có thể dùng lệnh này"
+  upgrade:
+    no-island: "&cBạn phải đứng trên đảo để sử dụng lệnh này!"
+    max-level: "&cNâng cấp này đã đạt cấp tối đa!"
+    not-enough-money: "&cBạn không đủ &eLinh Thạch&c! Cần &e{cost}&c, bạn có &e{balance}&c."
+    success: "&aĐã nâng cấp &e{upgrade} &alên cấp &e{level}&a! Đã trừ &e{cost} Linh Thạch&a."
+    upgrade-command: "/oregen3 upgrade"
+
+upgrade-gui:
+  title: "&6✦ &eNâng Cấp Đảo &6✦"
+  size: 45
+  sound:
+    success: ENTITY_PLAYER_LEVELUP
+    success-volume: 1.0
+    success-pitch: 1.0
+    fail: ENTITY_VILLAGER_NO
+    fail-volume: 1.0
+    fail-pitch: 1.0
+  filler:
+    enabled: true
+    material: GRAY_STAINED_GLASS_PANE
+    name: " "
+    slots: [0,1,2,3,4,5,6,7,8,36,37,38,39,40,41,42,43,44]
+  upgrades:
+    linhmach:
+      slot: 10
+      material: DIAMOND_PICKAXE
+      name: "&a⚡ Linh Mạch &7(Tốc Độ Sinh Quặng)"
+      lore:
+      - "&7Tăng tốc độ tái sinh quặng của máy phát."
+      - "&7Cứ mỗi cấp tăng &e5% &7tốc độ tái sinh."
+      - ""
+      - "&fCấp hiện tại: &a{level}&f/&a{max_level}"
+      - "&fChi phí nâng cấp tiếp: &b{cost} &fLinh Thạch"
+      - "&fSố dư Linh Thạch: &e{balance}"
+      - ""
+      - "&eClick &atrái &eđể nâng cấp!"
+      max_level: 20
+      cost_base: 500
+      cost_step: 2605
+      percent_per_level: 5.0
+    linhkhi:
+      slot: 12
+      material: EXPERIENCE_BOTTLE
+      name: "&b☁ Linh Khí Nồng Độ"
+      lore:
+      - "&7Tăng nồng độ linh khí trên đảo."
+      - ""
+      - "&fCấp hiện tại: &a{level}&f/&a{max_level}"
+      - "&fChi phí nâng cấp tiếp: &b{cost} &fLinh Thạch"
+      - ""
+      - "&eClick &atrái &eđể nâng cấp!"
+      max_level: 15
+      cost_base: 1000
+      cost_step: 2071
+    linhdien:
+      slot: 14
+      material: WHEAT
+      name: "&2🌾 Linh Điền"
+      lore:
+      - "&7Mở rộng và nâng cấp linh điền."
+      - ""
+      - "&fCấp hiện tại: &a{level}&f/&a{max_level}"
+      - "&fChi phí nâng cấp tiếp: &b{cost} &fLinh Thạch"
+      - ""
+      - "&eClick &atrái &eđể nâng cấp!"
+      max_level: 20
+      cost_base: 300
+      cost_step: 1037
+    tranphap:
+      slot: 16
+      material: ENCHANTING_TABLE
+      name: "&d✦ Trận Pháp"
+      lore:
+      - "&7Kích hoạt và nâng cấp trận pháp đảo."
+      - ""
+      - "&fCấp hiện tại: &a{level}&f/&a{max_level}"
+      - "&fChi phí nâng cấp tiếp: &b{cost} &fLinh Thạch"
+      - ""
+      - "&eClick &atrái &eđể nâng cấp!"
+      max_level: 10
+      cost_base: 2000
+      cost_step: 10889
+    khobau:
+      slot: 28
+      material: CHEST
+      name: "&6📦 Kho Báu"
+      lore:
+      - "&7Nâng cấp sức chứa kho báu đảo."
+      - ""
+      - "&fCấp hiện tại: &a{level}&f/&a{max_level}"
+      - "&fChi phí nâng cấp tiếp: &b{cost} &fLinh Thạch"
+      - ""
+      - "&eClick &atrái &eđể nâng cấp!"
+      max_level: 10
+      cost_base: 1500
+      cost_step: 4278
+    spawner:
+      slot: 30
+      material: SPAWNER
+      name: "&c🔮 Spawner Mở Rộng"
+      lore:
+      - "&7Mở rộng giới hạn spawner trên đảo."
+      - ""
+      - "&fCấp hiện tại: &a{level}&f/&a{max_level}"
+      - "&fChi phí nâng cấp tiếp: &b{cost} &fLinh Thạch"
+      - ""
+      - "&eClick &atrái &eđể nâng cấp!"
+      max_level: 15
+      cost_base: 5000
+      cost_step: 5357
+    truyentong:
+      slot: 32
+      material: END_PORTAL_FRAME
+      name: "&5🌀 Truyền Tống Trận"
+      lore:
+      - "&7Nâng cấp trận pháp truyền tống."
+      - ""
+      - "&fCấp hiện tại: &a{level}&f/&a{max_level}"
+      - "&fChi phí nâng cấp tiếp: &b{cost} &fLinh Thạch"
+      - ""
+      - "&eClick &atrái &eđể nâng cấp!"
+      max_level: 5
+      cost_base: 10000
+      cost_step: 22500
+    tier:
+      slot: 34
+      material: EMERALD
+      name: "&e⭐ Generator Tier"
+      lore:
+      - "&7Nâng cấp Tier máy phát quặng."
+      - "&7Tier cao hơn sẽ tạo ra quặng hiếm hơn."
+      - ""
+      - "{ores}"
+      - ""
+      - "&fQuyền hạn cần: &b{permission}"
+      - "&fCấp hiện tại: &a{level}&f/&a{max_level}"
+      - "&fChi phí nâng cấp tiếp: &b{cost} &fLinh Thạch"
+      - "&fSố dư Linh Thạch: &e{balance}"
+      - ""
+      - "&eClick &atrái &eđể nâng cấp!"
+      max_level: 6
+      cost_base: 50000
+      cost_step: 100000
+      commands:
+      - "lp user %player% permission set oregen3.tier.%level%"

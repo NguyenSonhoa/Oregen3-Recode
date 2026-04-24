@@ -1,0 +1,31 @@
+name: Oregen3
+version: ${version}
+main: me.banbeucmas.oregen3.Oregen3
+api-version: 1.21
+authors: [Banbeucmas, xHexed]
+softdepend: [ASkyBlock, AcidIsland, BentoBox, uSkyBlock, SuperiorSkyblock2, FabledSkyBlock, IridiumSkyblock, PlaceholderAPI, Vault, Oraxen, ItemsAdder]
+
+commands:
+  oregen3:
+    description: "Main command of the plugin"
+    aliases: [og3, og, oregen]
+  gen:
+    description: "Open upgrade GUI"
+  ore:
+    description: "Open upgrade GUI"
+  nangcapgen:
+    description: "Open upgrade GUI"
+
+permissions:
+  oregen3.information:
+    default: op
+  oregen3.reload:
+    default: op
+  oregen3.debug:
+    default: op
+  oregen3.help:
+    default: op
+  oregen3.edit:
+    default: op
+  oregen3.upgrade:
+    default: true

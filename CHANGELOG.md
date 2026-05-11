@@ -1,5 +1,10 @@
 # Changelog
 
+## 1.1.8 - 2026-05-11
+
+### Changed
+- Made regeneration countdown text start fully transparent, then fade in while rising during the cooldown animation.
+
 ## 1.1.7 - 2026-05-11
 
 ### Fixed

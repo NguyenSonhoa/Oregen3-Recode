@@ -152,7 +152,7 @@ public class RegenerationPreviewManager {
         textDisplay.setInterpolationDuration(getCountdownInterpolationDuration());
         textDisplay.setTeleportDuration(getCountdownTeleportDuration());
         textDisplay.setTransformation(createTextTransformation());
-        textDisplay.setTextOpacity((byte) 0);
+        applyTextFade(textDisplay, key, 0.0F);
         updateCountdownText(textDisplay, durationTicks);
         hideTextFromAll(textDisplay);
         return textDisplay;
@@ -178,22 +178,25 @@ public class RegenerationPreviewManager {
                     return;
                 }
 
-                elapsedTicks = Math.min(animationTicks, elapsedTicks + tickInterval);
-                float progress = elapsedTicks / (float) animationTicks;
+                int currentElapsedTicks = Math.min(animationTicks, elapsedTicks);
+                float progress = currentElapsedTicks / (float) animationTicks;
                 if (display != null && display.isValid()) {
                     float scale = minScale + ((maxScale - minScale) * progress);
                     display.setTransformation(createTransformation(scale));
                 }
                 if (textDisplay != null && textDisplay.isValid()) {
-                    updateTextFade(textDisplay, key, elapsedTicks);
-                    updateCountdownText(textDisplay, animationTicks - elapsedTicks);
+                    updateTextFade(textDisplay, key, currentElapsedTicks);
+                    updateCountdownText(textDisplay, animationTicks - currentElapsedTicks);
                     updateTextVisibility(key, textDisplay);
                 }
 
-                if (elapsedTicks >= animationTicks) {
+                if (currentElapsedTicks >= animationTicks) {
                     tasks.remove(key);
                     cancel();
+                    return;
                 }
+
+                elapsedTicks = Math.min(animationTicks, elapsedTicks + tickInterval);
             }
         }.runTaskTimer(plugin, 0L, tickInterval);
 
@@ -235,8 +238,17 @@ public class RegenerationPreviewManager {
     private void updateTextFade(TextDisplay textDisplay, Location key, int elapsedTicks) {
         int fadeDuration = Math.max(1, plugin.getConfig().getInt("global.generators.regeneration-preview.countdown.fade-duration", 10));
         float fadeProgress = Math.min(1.0F, elapsedTicks / (float) fadeDuration);
-        textDisplay.teleport(getTextLocation(key, fadeProgress));
-        textDisplay.setTextOpacity((byte) Math.round(255.0F * fadeProgress));
+        applyTextFade(textDisplay, key, fadeProgress);
+    }
+
+    private void applyTextFade(TextDisplay textDisplay, Location key, float fadeProgress) {
+        float clampedProgress = Math.max(0.0F, Math.min(1.0F, fadeProgress));
+        textDisplay.teleport(getTextLocation(key, clampedProgress));
+        textDisplay.setTextOpacity(toTextOpacity(clampedProgress));
+    }
+
+    private byte toTextOpacity(float fadeProgress) {
+        return (byte) Math.round(255.0F * fadeProgress);
     }
 
     private String formatSeconds(double seconds) {

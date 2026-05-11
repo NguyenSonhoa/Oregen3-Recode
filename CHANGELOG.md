@@ -1,5 +1,11 @@
 # Changelog
 
+## 1.1.1 - 2026-05-11
+
+### Fixed
+- Fixed duplicate pending regeneration tasks that could make the preview show one ore while the final block became another ore.
+- Fixed `/oregen edit` crashing on server builds that do not expose `ItemFlag.HIDE_POTION_CONTENTS`.
+
 ## 1.1 - 2026-05-11
 
 ### Added

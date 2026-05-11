@@ -67,14 +67,28 @@ public class ItemBuilder {
         if (this.data > 0) {
             item.setDurability(this.data);
         }
-        meta.addItemFlags(ItemFlag.HIDE_ATTRIBUTES, ItemFlag.HIDE_ENCHANTS,
-                ItemFlag.HIDE_POTION_CONTENTS, ItemFlag.HIDE_UNBREAKABLE);
+        addItemFlags(meta,
+                "HIDE_ATTRIBUTES",
+                "HIDE_ENCHANTS",
+                "HIDE_POTION_CONTENTS",
+                "HIDE_POTION_EFFECTS",
+                "HIDE_UNBREAKABLE");
         if (meta instanceof SkullMeta) {
             String skull = this.skull;
             if (skull != null) XSkull.of(meta).profile(Profileable.detect(skull)).apply();
         }
         item.setItemMeta(meta);
         return item;
+    }
+
+    private void addItemFlags(ItemMeta meta, String... flagNames) {
+        for (String flagName : flagNames) {
+            try {
+                meta.addItemFlags(ItemFlag.valueOf(flagName));
+            } catch (IllegalArgumentException ignored) {
+                // ItemFlag names differ between Bukkit/Paper versions.
+            }
+        }
     }
 
 }

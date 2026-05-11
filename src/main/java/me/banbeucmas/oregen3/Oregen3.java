@@ -64,12 +64,18 @@ public class Oregen3 extends JavaPlugin {
     private File configFolder = new File(getDataFolder(), "config.yml");
 
     public void onDisable() {
+        if (blockEventHandler != null) {
+            blockEventHandler.clearPendingRegenerations();
+        }
         regenerationPreviewManager.clear();
         dataManager.unregisterAll();
     }
 
     public void updateConfig() {
         reloadConfig();
+        if (blockEventHandler != null) {
+            blockEventHandler.clearPendingRegenerations();
+        }
         blockEventHandler = getConfig().getBoolean("global.listener.asyncListener", false) ?
                 new AsyncBlockEventHandler(this) : new SyncBlockEventHandler(this);
         if (blockPlaceTask != null) {

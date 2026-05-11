@@ -1,5 +1,10 @@
 # Changelog
 
+## 1.1.4 - 2026-05-11
+
+### Changed
+- Improved regeneration countdown text with fade-in, upward movement, see-through support, and display interpolation/teleport duration options.
+
 ## 1.1.3 - 2026-05-11
 
 ### Added

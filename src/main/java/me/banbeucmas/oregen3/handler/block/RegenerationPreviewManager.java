@@ -128,8 +128,7 @@ public class RegenerationPreviewManager {
             return null;
         }
 
-        double height = plugin.getConfig().getDouble("global.generators.regeneration-preview.countdown.height", 1.15D);
-        Location textLocation = key.clone().add(0.5D, height, 0.5D);
+        Location textLocation = getTextLocation(key, 0.0F);
         TextDisplay textDisplay = world.spawn(textLocation, TextDisplay.class);
         textDisplay.setGravity(false);
         textDisplay.setInvulnerable(true);
@@ -138,9 +137,12 @@ public class RegenerationPreviewManager {
         textDisplay.setBillboard(Display.Billboard.CENTER);
         textDisplay.setShadowed(true);
         textDisplay.setDefaultBackground(false);
-        textDisplay.setSeeThrough(false);
+        textDisplay.setSeeThrough(plugin.getConfig().getBoolean("global.generators.regeneration-preview.countdown.see-through", true));
         textDisplay.setAlignment(TextDisplay.TextAlignment.CENTER);
+        textDisplay.setInterpolationDuration(getCountdownInterpolationDuration());
+        textDisplay.setTeleportDuration(getCountdownTeleportDuration());
         textDisplay.setTransformation(createTextTransformation());
+        textDisplay.setTextOpacity((byte) 0);
         updateCountdownText(textDisplay, durationTicks);
         hideTextFromAll(textDisplay);
         return textDisplay;
@@ -173,6 +175,7 @@ public class RegenerationPreviewManager {
                     display.setTransformation(createTransformation(scale));
                 }
                 if (textDisplay != null && textDisplay.isValid()) {
+                    updateTextFade(textDisplay, key, elapsedTicks);
                     updateCountdownText(textDisplay, animationTicks - elapsedTicks);
                     updateTextVisibility(key, textDisplay);
                 }
@@ -217,6 +220,13 @@ public class RegenerationPreviewManager {
         String template = plugin.getConfig().getString("global.generators.regeneration-preview.countdown.text", "&e{seconds}s");
         textDisplay.setText(ChatColor.translateAlternateColorCodes('&',
                 template.replace("{seconds}", formatSeconds(remainingTicks / 20.0D))));
+    }
+
+    private void updateTextFade(TextDisplay textDisplay, Location key, int elapsedTicks) {
+        int fadeDuration = Math.max(1, plugin.getConfig().getInt("global.generators.regeneration-preview.countdown.fade-duration", 10));
+        float fadeProgress = Math.min(1.0F, elapsedTicks / (float) fadeDuration);
+        textDisplay.teleport(getTextLocation(key, fadeProgress));
+        textDisplay.setTextOpacity((byte) Math.round(255.0F * fadeProgress));
     }
 
     private String formatSeconds(double seconds) {
@@ -327,6 +337,16 @@ public class RegenerationPreviewManager {
         return Math.max(0.01F, Math.min(4.0F, scale));
     }
 
+    private int getCountdownInterpolationDuration() {
+        return Math.max(0, Math.min(59,
+                plugin.getConfig().getInt("global.generators.regeneration-preview.countdown.interpolation-duration", 1)));
+    }
+
+    private int getCountdownTeleportDuration() {
+        return Math.max(0, Math.min(59,
+                plugin.getConfig().getInt("global.generators.regeneration-preview.countdown.teleport-duration", 1)));
+    }
+
     private Transformation createTransformation(float scale) {
         float offset = (1.0F - scale) / 2.0F;
         return new Transformation(
@@ -346,6 +366,14 @@ public class RegenerationPreviewManager {
                 new Vector3f(scale, scale, scale),
                 new AxisAngle4f(0.0F, 0.0F, 1.0F, 0.0F)
         );
+    }
+
+    private Location getTextLocation(Location key, float fadeProgress) {
+        double height = plugin.getConfig().getDouble("global.generators.regeneration-preview.countdown.height", 1.15D);
+        double riseDistance = Math.max(0.0D,
+                plugin.getConfig().getDouble("global.generators.regeneration-preview.countdown.rise-distance", 0.35D));
+        double yOffset = height - (riseDistance * (1.0D - fadeProgress));
+        return key.clone().add(0.5D, yOffset, 0.5D);
     }
 
     private Location getKey(Location location) {

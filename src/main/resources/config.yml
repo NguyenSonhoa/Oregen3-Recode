@@ -90,6 +90,11 @@ global:
         height: 1.15
         scale: 0.6
         target-range: 6.0
+        see-through: true
+        fade-duration: 10
+        rise-distance: 0.35
+        interpolation-duration: 1
+        teleport-duration: 1
     maxBlockPlacePerTick: 0
 
 generators:

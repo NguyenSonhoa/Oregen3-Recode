@@ -10,13 +10,14 @@ import org.bukkit.World;
 import org.bukkit.block.Block;
 import org.bukkit.scheduler.BukkitTask;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
 
 public abstract class BlockEventHandler {
     Oregen3 plugin;
-    private final Map<Location, BukkitTask> pendingRegenerations = new HashMap<>();
+    private final Map<Location, PendingRegeneration> pendingRegenerations = new HashMap<>();
 
     public BlockEventHandler(Oregen3 plugin) {
         this.plugin = plugin;
@@ -43,8 +44,12 @@ public abstract class BlockEventHandler {
             return;
         }
 
-        for (BukkitTask task : pendingRegenerations.values()) {
-            task.cancel();
+        for (PendingRegeneration pending : new ArrayList<>(pendingRegenerations.values())) {
+            if (pending.task != null) {
+                pending.task.cancel();
+            }
+            plugin.getRegenerationPreviewManager().remove(pending.block.getLocation());
+            placeGeneratedBlock(pending.block, pending.placer, pending.generator);
         }
         pendingRegenerations.clear();
     }
@@ -69,12 +74,17 @@ public abstract class BlockEventHandler {
         if (placer == null) return;
 
         plugin.getRegenerationPreviewManager().show(block, placer, delay);
+        PendingRegeneration pending = new PendingRegeneration(block, placer, mc);
         BukkitTask task = Bukkit.getScheduler().runTaskLater(plugin, () -> {
-            pendingRegenerations.remove(key);
-            plugin.getRegenerationPreviewManager().remove(block.getLocation());
-            placeGeneratedBlock(block, placer, mc);
+            PendingRegeneration active = pendingRegenerations.remove(key);
+            if (active == null) {
+                return;
+            }
+            plugin.getRegenerationPreviewManager().remove(active.block.getLocation());
+            placeGeneratedBlock(active.block, active.placer, active.generator);
         }, delay);
-        pendingRegenerations.put(key, task);
+        pending.task = task;
+        pendingRegenerations.put(key, pending);
     }
 
     private void placeGeneratedBlock(final Block block, final BlockPlacer placer, final Generator mc) {
@@ -99,5 +109,18 @@ public abstract class BlockEventHandler {
 
     private Location getBlockKey(Location location) {
         return new Location(location.getWorld(), location.getBlockX(), location.getBlockY(), location.getBlockZ());
+    }
+
+    private static class PendingRegeneration {
+        private final Block block;
+        private final BlockPlacer placer;
+        private final Generator generator;
+        private BukkitTask task;
+
+        private PendingRegeneration(Block block, BlockPlacer placer, Generator generator) {
+            this.block = block;
+            this.placer = placer;
+            this.generator = generator;
+        }
     }
 }

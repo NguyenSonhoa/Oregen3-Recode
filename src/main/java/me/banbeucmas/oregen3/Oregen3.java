@@ -68,6 +68,9 @@ public class Oregen3 extends JavaPlugin {
             blockEventHandler.clearPendingRegenerations();
         }
         regenerationPreviewManager.clear();
+        if (blockPlaceTask != null) {
+            blockPlaceTask.stop();
+        }
         dataManager.unregisterAll();
     }
 

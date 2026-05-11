@@ -1,5 +1,10 @@
 # Changelog
 
+## 1.1.5 - 2026-05-11
+
+### Fixed
+- Fixed pending regenerating blocks being left as air after server restart or plugin reload by flushing selected regen blocks before shutdown.
+
 ## 1.1.4 - 2026-05-11
 
 ### Changed

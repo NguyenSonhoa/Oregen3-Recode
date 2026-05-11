@@ -77,6 +77,12 @@ global:
       name: BLOCK_FIRE_EXTINGUISH
       volume: 1
       pitch: 1
+    regeneration-preview:
+      enabled: true
+      min-scale: 0.05
+      max-scale: 1.0
+      tick-interval: 1
+      brightness: 15
     maxBlockPlacePerTick: 0
 
 generators:
@@ -208,91 +214,11 @@ upgrade-gui:
       max_level: 20
       cost_base: 500
       cost_step: 2605
+      use_level_costs: false
+      level_costs:
+        1: 2000
+        2: 5000
       percent_per_level: 5.0
-    linhkhi:
-      slot: 12
-      material: EXPERIENCE_BOTTLE
-      name: "&b☁ Linh Khí Nồng Độ"
-      lore:
-      - "&7Tăng nồng độ linh khí trên đảo."
-      - ""
-      - "&fCấp hiện tại: &a{level}&f/&a{max_level}"
-      - "&fChi phí nâng cấp tiếp: &b{cost} &fLinh Thạch"
-      - ""
-      - "&eClick &atrái &eđể nâng cấp!"
-      max_level: 15
-      cost_base: 1000
-      cost_step: 2071
-    linhdien:
-      slot: 14
-      material: WHEAT
-      name: "&2🌾 Linh Điền"
-      lore:
-      - "&7Mở rộng và nâng cấp linh điền."
-      - ""
-      - "&fCấp hiện tại: &a{level}&f/&a{max_level}"
-      - "&fChi phí nâng cấp tiếp: &b{cost} &fLinh Thạch"
-      - ""
-      - "&eClick &atrái &eđể nâng cấp!"
-      max_level: 20
-      cost_base: 300
-      cost_step: 1037
-    tranphap:
-      slot: 16
-      material: ENCHANTING_TABLE
-      name: "&d✦ Trận Pháp"
-      lore:
-      - "&7Kích hoạt và nâng cấp trận pháp đảo."
-      - ""
-      - "&fCấp hiện tại: &a{level}&f/&a{max_level}"
-      - "&fChi phí nâng cấp tiếp: &b{cost} &fLinh Thạch"
-      - ""
-      - "&eClick &atrái &eđể nâng cấp!"
-      max_level: 10
-      cost_base: 2000
-      cost_step: 10889
-    khobau:
-      slot: 28
-      material: CHEST
-      name: "&6📦 Kho Báu"
-      lore:
-      - "&7Nâng cấp sức chứa kho báu đảo."
-      - ""
-      - "&fCấp hiện tại: &a{level}&f/&a{max_level}"
-      - "&fChi phí nâng cấp tiếp: &b{cost} &fLinh Thạch"
-      - ""
-      - "&eClick &atrái &eđể nâng cấp!"
-      max_level: 10
-      cost_base: 1500
-      cost_step: 4278
-    spawner:
-      slot: 30
-      material: SPAWNER
-      name: "&c🔮 Spawner Mở Rộng"
-      lore:
-      - "&7Mở rộng giới hạn spawner trên đảo."
-      - ""
-      - "&fCấp hiện tại: &a{level}&f/&a{max_level}"
-      - "&fChi phí nâng cấp tiếp: &b{cost} &fLinh Thạch"
-      - ""
-      - "&eClick &atrái &eđể nâng cấp!"
-      max_level: 15
-      cost_base: 5000
-      cost_step: 5357
-    truyentong:
-      slot: 32
-      material: END_PORTAL_FRAME
-      name: "&5🌀 Truyền Tống Trận"
-      lore:
-      - "&7Nâng cấp trận pháp truyền tống."
-      - ""
-      - "&fCấp hiện tại: &a{level}&f/&a{max_level}"
-      - "&fChi phí nâng cấp tiếp: &b{cost} &fLinh Thạch"
-      - ""
-      - "&eClick &atrái &eđể nâng cấp!"
-      max_level: 5
-      cost_base: 10000
-      cost_step: 22500
     tier:
       slot: 34
       material: EMERALD
@@ -310,8 +236,8 @@ upgrade-gui:
       - ""
       - "&eClick &atrái &eđể nâng cấp!"
       max_level: 6
-      cost_base: 50000
-      cost_step: 100000
+      cost_base: 50000 #sẽ bị tắt nếu use_level_costs là true
+      cost_step: 100000 #sẽ bị tắt nếu use_level_costs là true
       use_level_costs: false
       level_costs:
         1: 2000

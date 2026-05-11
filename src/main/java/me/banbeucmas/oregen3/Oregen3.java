@@ -6,6 +6,7 @@ import me.banbeucmas.oregen3.commands.CommandHandler;
 import me.banbeucmas.oregen3.data.DataManager;
 import me.banbeucmas.oregen3.data.UpgradeManager;
 import me.banbeucmas.oregen3.data.permission.*;
+import me.banbeucmas.oregen3.handler.block.RegenerationPreviewManager;
 import me.banbeucmas.oregen3.handler.block.placetask.BlockPlaceTask;
 import me.banbeucmas.oregen3.handler.block.placetask.LimitedBlockPlaceTask;
 import me.banbeucmas.oregen3.handler.block.placetask.NormalBlockPlaceTask;
@@ -48,6 +49,7 @@ public class Oregen3 extends JavaPlugin {
     private PermissionChecker permissionChecker;
     private BlockEventHandler blockEventHandler;
     private BlockPlaceTask blockPlaceTask;
+    private RegenerationPreviewManager regenerationPreviewManager = new RegenerationPreviewManager(this);
     private PluginUtils utils = new PluginUtils(this);
     private StringParser stringParser = new StringParser(this);
     private BlockChecker blockChecker = new BlockChecker(this);
@@ -62,6 +64,7 @@ public class Oregen3 extends JavaPlugin {
     private File configFolder = new File(getDataFolder(), "config.yml");
 
     public void onDisable() {
+        regenerationPreviewManager.clear();
         dataManager.unregisterAll();
     }
 
@@ -72,6 +75,7 @@ public class Oregen3 extends JavaPlugin {
         if (blockPlaceTask != null) {
             blockPlaceTask.stop();
         }
+        regenerationPreviewManager.clear();
         blockPlaceTask = getConfig().getLong("global.generators.maxBlockPlacePerTick", -1) > 0 ?
                 new LimitedBlockPlaceTask(this) : new NormalBlockPlaceTask(this);
 

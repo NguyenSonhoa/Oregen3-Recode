@@ -1,9 +1,14 @@
 package me.banbeucmas.oregen3.handler.block.placer;
 
 import org.bukkit.block.Block;
+import org.bukkit.block.data.BlockData;
 
 public interface BlockPlacer {
     void placeBlock(Block block);
+
+    default BlockData getDisplayBlockData() {
+        return null;
+    }
 
     static BlockPlacer getBlockPlacer(String mat) {
         if (mat.startsWith("oraxen-")) {

@@ -3,7 +3,6 @@ package me.banbeucmas.oregen3.listener;
 import com.cryptomorin.xseries.XBlock;
 import me.banbeucmas.oregen3.Oregen3;
 import me.banbeucmas.oregen3.util.BlockChecker;
-import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.block.Block;
@@ -139,7 +138,7 @@ public class BlockListener implements Listener {
         if (finalDelay <= 0) {
             plugin.getBlockEventHandler().generateBlock(block);
         } else {
-            Bukkit.getScheduler().runTaskLater(plugin, () -> plugin.getBlockEventHandler().generateBlock(block), finalDelay);
+            plugin.getBlockEventHandler().regenerateBlock(block, finalDelay);
         }
     }
 }

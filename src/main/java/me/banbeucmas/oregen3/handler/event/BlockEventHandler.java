@@ -3,6 +3,8 @@ package me.banbeucmas.oregen3.handler.event;
 import com.cryptomorin.xseries.XSound;
 import me.banbeucmas.oregen3.Oregen3;
 import me.banbeucmas.oregen3.data.Generator;
+import me.banbeucmas.oregen3.handler.block.placer.BlockPlacer;
+import org.bukkit.Bukkit;
 import org.bukkit.World;
 import org.bukkit.block.Block;
 
@@ -17,10 +19,42 @@ public abstract class BlockEventHandler {
 
     public abstract void generateBlock(final Block block);
 
+    public void regenerateBlock(final Block block, final int delay) {
+        if (delay <= 0) {
+            generateBlock(block);
+            return;
+        }
+
+        if (Bukkit.isPrimaryThread()) {
+            startDelayedGeneration(block, delay);
+        } else {
+            Bukkit.getScheduler().runTask(plugin, () -> startDelayedGeneration(block, delay));
+        }
+    }
+
     void generate(final Block block) {
         final Generator mc = plugin.getUtils().getChosenGenerator(block.getLocation());
         if (mc == null) return;
-        plugin.getBlockPlaceTask().placeBlock(block, mc.randomChance(), mc);
+        BlockPlacer placer = mc.randomChance();
+        if (placer == null) return;
+        placeGeneratedBlock(block, placer, mc);
+    }
+
+    private void startDelayedGeneration(final Block block, final int delay) {
+        final Generator mc = plugin.getUtils().getChosenGenerator(block.getLocation());
+        if (mc == null) return;
+        final BlockPlacer placer = mc.randomChance();
+        if (placer == null) return;
+
+        plugin.getRegenerationPreviewManager().show(block, placer, delay);
+        Bukkit.getScheduler().runTaskLater(plugin, () -> {
+            plugin.getRegenerationPreviewManager().remove(block.getLocation());
+            placeGeneratedBlock(block, placer, mc);
+        }, delay);
+    }
+
+    private void placeGeneratedBlock(final Block block, final BlockPlacer placer, final Generator mc) {
+        plugin.getBlockPlaceTask().placeBlock(block, placer, mc);
         sendBlockEffect(block, mc);
     }
 

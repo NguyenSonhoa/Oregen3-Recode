@@ -153,8 +153,7 @@ public class BlockBreakListener implements Listener {
             plugin.getBlockEventHandler().generateBlock(block);
         }
         else {
-            plugin.getServer().getScheduler().runTaskLater(plugin,
-                    () -> plugin.getBlockEventHandler().generateBlock(block), delay);
+            plugin.getBlockEventHandler().regenerateBlock(block, delay);
         }
     }
 }

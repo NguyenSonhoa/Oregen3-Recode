@@ -1,27 +1,190 @@
 # -------------------------------------
 # Configuration link: https://github.com/xHexed/Oregen3/blob/master/src/main/resources/config.yml
 # Please click this link if you use the plugin the first time or updating from an old version
+# Generator options:
+#   - random: list of blocks that will randomly be chosen upon generating ores, defaults to air (stops the liquid from flowing)
+#   - permission: The permission it will use instead of the default provided one, defaults to oregen3.generator.<generator name>
+#   - sound: sound options when block is being generated
+#     - name: Defaults to BLOCK_FIRE_EXTINGUISH. You can use old sound enums,
+#             as long as it playable in your server version (ex: 1.8 sound names for 1.12 server)
+#     - volume: Range from 0.0 to 2.0 (defaults to 1)
+#     - pitch: Same as volume
+#   - world: World-related options
+#     - blacklist: Controls if the generator can only generate in the list provided (true) or vise-versa (false)
+#     - list: defaults to an empty list
 # -------------------------------------
 mode:
   waterBlock: true
   lavaBlock: false
-  waterLava: true
+  waterLava: false
 
-# Danh sách các khối làm giá đỡ để tạo quặng (Hàng rào, sắt, ...)
+# Also supports cross-version material names (ex: FENCE or OAK_FENCE all works)
 blocks:
-- FENCE
 - OAK_FENCE
 - ACACIA_FENCE
 - BIRCH_FENCE
 - DARK_OAK_FENCE
-- JUNGLE_FENCE
-- SPRUCE_FENCE
-- IRON_FENCE
-- NETHER_FENCE
-- COBBLESTONE_WALL
-- MOSS_COBBLESTONE_WALL
 
-# Hiển thị tên quặng tùy chỉnh trong GUI nâng cấp
+# The plugin will try to find a skyblock plugin to enable owner's permission feature
+enableDependency: true
+defaultGenerator: default
+# Adds a check to prevent placing blocks on non-air blocks
+preventOverrideBlocks: false
+
+hooks:
+  skyblock:
+    # You can choose between owner, lowest and highest
+    getGeneratorMode: owner
+    # Only works on lowest and highest mode
+    ignoreOfflinePlayers: false
+  Vault:
+    # Force checking permissions asynchronously. Change to true if you have problems using the non-async one
+    forceAsync: false
+    # A plugin list that store permission data asynchronously (using database, ...) or you can list other plugins
+    pluginAsyncList:
+    - LuckPerms
+
+global:
+  # Switch between Bukkit or Java async scheduler (Java is faster but "might" cause some issues)
+  # This affects generating blocks and/or permission checks
+  useJavaAsyncScheduler: false
+  listener:
+    # Generate blocks asynchronously. Turn this on if you experience lag while generating blocks
+    asyncListener: true
+  generators:
+    # Checks if the block location are suitable to generate right after breaking a block
+    # This ensures consistent generating speed on some generator types instead of waiting for liquid to flow
+    # Might cause more lag as more blocks being generated, highly recommend turning on asyncListener to offset this
+    check-regen:
+      enabled: true
+      # Checks sources for regen after a configurable delay (in ticks)
+      # Put value below 0 to disable a specific mode
+      # Check preventOverrideBlocks option if delay is slower than liquid flow delay
+      # [!] Also requires mode-specific settings (at the start of config file) be enabled
+      mode:
+        waterBlock: 100
+        lavaBlock: 200
+        waterLava: 200
+    world:
+      enabled: false
+      blacklist: true
+      list:
+      - world1
+      - world2
+    sound:
+      enabled: false
+      name: BLOCK_FIRE_EXTINGUISH
+      volume: 3
+      pitch: 2
+    regeneration-preview:
+      enabled: true
+      min-scale: 0.05
+      max-scale: 1.0
+      tick-interval: 1
+      countdown:
+        enabled: true
+        text: "&e{seconds}s"
+        decimal-format: "0.0"
+        height: 1.15
+        scale: 0.6
+        target-range: 6.0
+        see-through: true
+        fade-duration: 10
+        rise-distance: 0.35
+        interpolation-duration: 1
+        teleport-duration: 1
+      brightness: 6
+    # Set to 0 to disable
+    maxBlockPlacePerTick: 0
+
+generators:
+  default:
+    name: "Tier 0"
+    random:
+      COBBLESTONE: 100.0
+  tier1:
+    name: "Tier 1"
+    permission: oregen3.tier.1
+    priority: 1
+    realm-required: 2
+    random:
+      COBBLESTONE: 60.0
+      COAL_ORE: 25.0
+      IRON_ORE: 10.0
+      GOLD_ORE: 5.0
+    drops:
+      replace: false # Nếu true, quặng sẽ không rơi ra block/vật phẩm vanilla nữa
+      items:
+        mmoitems-MATERIAL:STEEL_INGOT: 50.0
+        COAL: 5.0
+  tier2:
+    name: "Tier 2"
+    permission: oregen3.tier.2
+    priority: 2
+    realm-required: 3
+    random:
+      COBBLESTONE: 40.0
+      IRON_ORE: 25.0
+      GOLD_ORE: 15.0
+      LAPIS_ORE: 10.0
+      DIAMOND_ORE: 5.0
+      EMERALD_ORE: 5.0
+    drops:
+      replace: false # Nếu true, quặng sẽ không rơi ra block/vật phẩm vanilla nữa
+      items:
+        mmoitems-MATERIAL:STEEL_INGOT: 50.0
+        COAL: 5.0
+  tier3:
+    name: "Tier 3"
+    permission: oregen3.tier.3
+    priority: 3
+    realm-required: 4
+    random:
+      IRON_ORE: 20.0
+      GOLD_ORE: 15.0
+      DIAMOND_ORE: 15.0
+      EMERALD_ORE: 10.0
+      COAL_BLOCK: 20.0
+      IRON_BLOCK: 10.0
+      GOLD_BLOCK: 10.0
+    drops:
+      replace: true # Nếu true, quặng sẽ không rơi ra block/vật phẩm vanilla nữa
+      items:
+        mmoitems-MATERIAL:STEEL_INGOT: 50.0
+        COAL: 5.0
+  tier4:
+    name: "Tier 4"
+    permission: oregen3.tier.4
+    priority: 4
+    random:
+      DIAMOND_ORE: 15.0
+      EMERALD_ORE: 10.0
+      GOLD_BLOCK: 25.0
+      IRON_BLOCK: 15.0
+      DIAMOND_BLOCK: 15.0
+      EMERALD_BLOCK: 10.0
+      NETHERITE_INGOT: 10.0
+  tier5:
+    name: "Tier 5"
+    permission: oregen3.tier.5
+    priority: 5
+    random:
+      GOLD_BLOCK: 30.0
+      IRON_BLOCK: 20.0
+      DIAMOND_BLOCK: 15.0
+      EMERALD_BLOCK: 15.0
+  tier6:
+    name: "Tier 6"
+    permission: oregen3.tier.6
+    priority: 6
+    random:
+      DIAMOND_BLOCK: 30.0
+      EMERALD_BLOCK: 30.0
+      NETHERITE_BLOCK: 35.0
+    drops:
+      replace: false # Nếu true, quặng sẽ không rơi ra block/vật phẩm vanilla nữa
+      items:
+        mmoitems-MATERIAL:STEEL_INGOT: 100
 material-display:
   COBBLESTONE: "&7Đá Cuội"
   COAL_ORE: "&0Quặng Than"
@@ -35,152 +198,14 @@ material-display:
   GOLD_BLOCK: "&eKhối Vàng"
   DIAMOND_BLOCK: "&bKhối Kim Cương"
   EMERALD_BLOCK: "&aKhối Lục Bảo"
-  NETHERITE_INGOT: "&4Phôi Netherite"
   NETHERITE_BLOCK: "&4Khối Netherite"
-  BEACON: "&fĐèn Hiệu"
-  NETHER_STAR: "&eSao Địa Ngục"
-
-# The plugin will try to find a skyblock plugin to enable owner's permission feature
-enableDependency: true
-defaultGenerator: default
-# Adds a check to prevent placing blocks on non-air blocks
-preventOverrideBlocks: false
-
-hooks:
-  skyblock:
-    getGeneratorMode: owner
-    ignoreOfflinePlayers: false
-  Vault:
-    forceAsync: false
-    pluginAsyncList:
-    - LuckPerms
-
-global:
-  useJavaAsyncScheduler: false
-  listener:
-    asyncListener: true
-  generators:
-    check-regen:
-      enabled: true
-      mode:
-        waterBlock: 0
-        lavaBlock: 0
-        waterLava: 0
-    world:
-      enabled: false
-      blacklist: true
-      list:
-      - world1
-      - world2
-    sound:
-      enabled: true
-      name: BLOCK_FIRE_EXTINGUISH
-      volume: 1
-      pitch: 1
-    regeneration-preview:
-      enabled: true
-      min-scale: 0.05
-      max-scale: 1.0
-      tick-interval: 1
-      brightness: 15
-      countdown:
-        enabled: true
-        text: "&e{seconds}s"
-        decimal-format: "0.0"
-        height: 1.15
-        scale: 0.6
-        target-range: 6.0
-        see-through: true
-        fade-duration: 10
-        rise-distance: 0.35
-        interpolation-duration: 1
-        teleport-duration: 1
-    maxBlockPlacePerTick: 0
-
-generators:
-  default:
-    name: "Tier 0"
-    priority: 0
-    random:
-      COBBLESTONE: 100.0
-  tier1:
-    name: "Tier 1"
-    permission: oregen3.tier.1
-    realm-required: 2
-    priority: 1
-    random:
-      COBBLESTONE: 60.0
-      COAL_ORE: 25.0
-      IRON_ORE: 10.0
-      GOLD_ORE: 5.0
-    drops:
-      replace: false # Nếu true, quặng sẽ không rơi ra block/vật phẩm vanilla nữa
-      items:
-        mmoitems-MATERIAL:DEOBTGI: 10.0
-        COAL: 5.0
-  tier2:
-    name: "Tier 2"
-    permission: oregen3.tier.2
-    realm-required: 2
-    priority: 2
-    random:
-      COBBLESTONE: 40.0
-      IRON_ORE: 25.0
-      GOLD_ORE: 15.0
-      LAPIS_ORE: 10.0
-      DIAMOND_ORE: 5.0
-      EMERALD_ORE: 5.0
-  tier3:
-    name: "Tier 3"
-    permission: oregen3.tier.3
-    realm-required: 2
-    priority: 3
-    random:
-      IRON_ORE: 20.0
-      GOLD_ORE: 15.0
-      DIAMOND_ORE: 15.0
-      EMERALD_ORE: 10.0
-      COAL_BLOCK: 20.0
-      IRON_BLOCK: 10.0
-      GOLD_BLOCK: 10.0
-  tier4:
-    name: "Tier 4"
-    permission: oregen3.tier.4
-    realm-required: 2
-    priority: 4
-    random:
-      DIAMOND_ORE: 15.0
-      EMERALD_ORE: 10.0
-      GOLD_BLOCK: 25.0
-      IRON_BLOCK: 15.0
-      DIAMOND_BLOCK: 15.0
-      EMERALD_BLOCK: 10.0
-      NETHERITE_BLOCK: 10.0 # Changed from NETHERITE_INGOT (not a block)
-  tier5:
-    name: "Tier 5"
-    permission: oregen3.tier.5
-    realm-required: 2
-    priority: 5
-    random:
-      GOLD_BLOCK: 30.0
-      IRON_BLOCK: 20.0
-      DIAMOND_BLOCK: 15.0
-      EMERALD_BLOCK: 15.0
-      NETHERITE_BLOCK: 10.0
-      BEACON: 10.0
-  tier6:
-    name: "Tier 6"
-    permission: oregen3.tier.6
-    realm-required: 2
-    priority: 6
-    random:
-      DIAMOND_BLOCK: 30.0
-      EMERALD_BLOCK: 30.0
-      NETHERITE_BLOCK: 35.0
-    drops:
-      replace: false # Nếu true, quặng sẽ không rơi ra block/vật phẩm vanilla nữa
-      items:
-        mmoitems-MATERIAL:STEEL_INGOT: 100
+# Available placeholder for messages:
+# - noPermission: %perm%
+# - noPlayer: %player%
+# - noIslandOthers: %player%
+# - messages:
+#    commands: %label% (First argument in command)
+# You can also use PlaceholderAPI placeholders
 
 messages:
   prefix: '&f[&6OreGen&e3&f]'

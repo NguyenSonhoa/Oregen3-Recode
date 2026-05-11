@@ -26,5 +26,9 @@ public abstract class BlockPlaceTask {
 
     public abstract void placeBlock(Block block, BlockPlacer blockPlacer, Generator generator);
 
+    public boolean placeBlockNow(Block block, BlockPlacer blockPlacer, Generator generator) {
+        return place(block, blockPlacer, generator);
+    }
+
     public void stop() {}
 }

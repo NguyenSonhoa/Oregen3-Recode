@@ -40,7 +40,9 @@ public abstract class BlockEventHandler {
 
     public void clearPendingRegenerations() {
         if (!Bukkit.isPrimaryThread()) {
-            Bukkit.getScheduler().runTask(plugin, this::clearPendingRegenerations);
+            if (plugin.isEnabled()) {
+                Bukkit.getScheduler().runTask(plugin, this::clearPendingRegenerations);
+            }
             return;
         }
 
@@ -49,7 +51,7 @@ public abstract class BlockEventHandler {
                 pending.task.cancel();
             }
             plugin.getRegenerationPreviewManager().remove(pending.block.getLocation());
-            placeGeneratedBlock(pending.block, pending.placer, pending.generator);
+            placeGeneratedBlockNow(pending.block, pending.placer, pending.generator);
         }
         pendingRegenerations.clear();
     }
@@ -90,6 +92,10 @@ public abstract class BlockEventHandler {
     private void placeGeneratedBlock(final Block block, final BlockPlacer placer, final Generator mc) {
         plugin.getBlockPlaceTask().placeBlock(block, placer, mc);
         sendBlockEffect(block, mc);
+    }
+
+    private void placeGeneratedBlockNow(final Block block, final BlockPlacer placer, final Generator mc) {
+        plugin.getBlockPlaceTask().placeBlockNow(block, placer, mc);
     }
 
     private void sendBlockEffect(final Block to, final Generator mc) {

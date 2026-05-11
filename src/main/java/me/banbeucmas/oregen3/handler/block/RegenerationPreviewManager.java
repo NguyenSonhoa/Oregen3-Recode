@@ -39,11 +39,15 @@ public class RegenerationPreviewManager {
 
     public void show(Block block, BlockPlacer placer, int durationTicks) {
         if (!Bukkit.isPrimaryThread()) {
+            if (!plugin.isEnabled()) {
+                return;
+            }
             Bukkit.getScheduler().runTask(plugin, () -> show(block, placer, durationTicks));
             return;
         }
 
-        if (!plugin.getConfig().getBoolean("global.generators.regeneration-preview.enabled", true)
+        if (!plugin.isEnabled()
+                || !plugin.getConfig().getBoolean("global.generators.regeneration-preview.enabled", true)
                 || durationTicks <= 0) {
             return;
         }
@@ -69,6 +73,9 @@ public class RegenerationPreviewManager {
 
     public void remove(Location location) {
         if (!Bukkit.isPrimaryThread()) {
+            if (!plugin.isEnabled()) {
+                return;
+            }
             Bukkit.getScheduler().runTask(plugin, () -> remove(location));
             return;
         }
@@ -78,6 +85,9 @@ public class RegenerationPreviewManager {
 
     public void clear() {
         if (!Bukkit.isPrimaryThread()) {
+            if (!plugin.isEnabled()) {
+                return;
+            }
             Bukkit.getScheduler().runTask(plugin, this::clear);
             return;
         }
@@ -247,7 +257,7 @@ public class RegenerationPreviewManager {
             if (isLookingAtBlock(player, key, targetRange)) {
                 lookingPlayers.add(player.getUniqueId());
                 if (viewers.add(player.getUniqueId())) {
-                    player.showEntity(plugin, textDisplay);
+                    showTextToPlayer(player, textDisplay);
                 }
             }
         }
@@ -258,7 +268,7 @@ public class RegenerationPreviewManager {
             }
             Player player = Bukkit.getPlayer(viewer);
             if (player != null) {
-                player.hideEntity(plugin, textDisplay);
+                hideTextFromPlayer(player, textDisplay);
             }
             viewers.remove(viewer);
         }
@@ -313,17 +323,17 @@ public class RegenerationPreviewManager {
 
     private void hideTextFromAll(TextDisplay textDisplay) {
         for (Player player : Bukkit.getOnlinePlayers()) {
-            player.hideEntity(plugin, textDisplay);
+            hideTextFromPlayer(player, textDisplay);
         }
     }
 
     private void removeTextDisplay(Location key, TextDisplay textDisplay) {
         Set<UUID> viewers = textViewers.remove(key);
-        if (viewers != null) {
+        if (viewers != null && canChangeEntityVisibility()) {
             for (UUID viewer : viewers) {
                 Player player = Bukkit.getPlayer(viewer);
                 if (player != null) {
-                    player.hideEntity(plugin, textDisplay);
+                    hideTextFromPlayer(player, textDisplay);
                 }
             }
         }
@@ -331,6 +341,32 @@ public class RegenerationPreviewManager {
         if (textDisplay.isValid()) {
             textDisplay.remove();
         }
+    }
+
+    private void showTextToPlayer(Player player, TextDisplay textDisplay) {
+        if (!canChangeEntityVisibility()) {
+            return;
+        }
+
+        try {
+            player.showEntity(plugin, textDisplay);
+        } catch (IllegalArgumentException ignored) {
+        }
+    }
+
+    private void hideTextFromPlayer(Player player, TextDisplay textDisplay) {
+        if (!canChangeEntityVisibility()) {
+            return;
+        }
+
+        try {
+            player.hideEntity(plugin, textDisplay);
+        } catch (IllegalArgumentException ignored) {
+        }
+    }
+
+    private boolean canChangeEntityVisibility() {
+        return plugin.isEnabled();
     }
 
     private float clampScale(float scale) {

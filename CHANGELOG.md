@@ -1,5 +1,15 @@
 # Changelog
 
+## 1.1.7 - 2026-05-11
+
+### Fixed
+- Fixed shutdown cleanup for countdown text displays calling entity visibility APIs after the plugin is already disabled.
+
+## 1.1.6 - 2026-05-11
+
+### Fixed
+- Fixed shutdown flush for pending regenerating blocks using the scheduler after the plugin is already disabled.
+
 ## 1.1.5 - 2026-05-11
 
 ### Fixed

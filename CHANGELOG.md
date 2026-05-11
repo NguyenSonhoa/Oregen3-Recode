@@ -1,5 +1,10 @@
 # Changelog
 
+## 1.1.2 - 2026-05-11
+
+### Fixed
+- Fixed editor GUI crashes on Leaf/Paper builds where XSeries custom skull texture support is incompatible with the server authlib.
+
 ## 1.1.1 - 2026-05-11
 
 ### Fixed

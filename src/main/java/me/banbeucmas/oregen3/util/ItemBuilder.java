@@ -75,10 +75,18 @@ public class ItemBuilder {
                 "HIDE_UNBREAKABLE");
         if (meta instanceof SkullMeta) {
             String skull = this.skull;
-            if (skull != null) XSkull.of(meta).profile(Profileable.detect(skull)).apply();
+            if (skull != null) applySkullTexture(meta, skull);
         }
         item.setItemMeta(meta);
         return item;
+    }
+
+    private void applySkullTexture(ItemMeta meta, String skull) {
+        try {
+            XSkull.of(meta).profile(Profileable.detect(skull)).apply();
+        } catch (Throwable ignored) {
+            // Custom skull internals can break on some server/authlib builds; keep the GUI usable.
+        }
     }
 
     private void addItemFlags(ItemMeta meta, String... flagNames) {

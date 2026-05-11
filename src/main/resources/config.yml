@@ -83,6 +83,13 @@ global:
       max-scale: 1.0
       tick-interval: 1
       brightness: 15
+      countdown:
+        enabled: true
+        text: "&e{seconds}s"
+        decimal-format: "0.0"
+        height: 1.15
+        scale: 0.6
+        target-range: 6.0
     maxBlockPlacePerTick: 0
 
 generators:

@@ -1,5 +1,10 @@
 # Changelog
 
+## 1.1.3 - 2026-05-11
+
+### Added
+- Added a targeted countdown `TextDisplay` for regenerating blocks that appears only to players looking at that block.
+
 ## 1.1.2 - 2026-05-11
 
 ### Fixed

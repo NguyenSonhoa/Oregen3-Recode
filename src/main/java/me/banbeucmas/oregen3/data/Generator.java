@@ -30,7 +30,7 @@ public class Generator {
     private Map<String, Double> random;
     private Map<String, Double> drops;
     private boolean replaceDrops;
-    private int realmRequired; // Added for TuTienCore
+    private int realmRequired;
 
     private transient double totalChance;
     @Getter(value = AccessLevel.NONE) @Setter(value = AccessLevel.NONE)
@@ -46,7 +46,7 @@ public class Generator {
         permission = path.getString("permission", "oregen3.generator." + id);
         priority   = path.getLong("priority", 0);
         level      = path.getDouble("level", 0);
-        realmRequired = path.getInt("realm-required", 0); // Parse realm requirement
+        realmRequired = path.getInt("realm-required", 0);
         if (path.isSet("sound")) {
             soundEnabled = path.getBoolean("sound.enabled", true);
             sound        = XSound.of(path.getString("sound.name", "BLOCK_FIRE_EXTINGUISH")).map(XSound::get).orElse(XSound.BLOCK_FIRE_EXTINGUISH.get());
@@ -58,9 +58,14 @@ public class Generator {
             worldBlacklist = path.getBoolean("world.blacklist", true);
             worldList      = new LinkedHashSet<>(path.getStringList("world.list"));
         }
+
         random = new LinkedHashMap<>();
-        for (final String mat : Objects.requireNonNull(path.getConfigurationSection("random")).getKeys(false)) {
-            random.put(mat, path.getDouble("random." + mat));
+        ConfigurationSection randomSection = path.getConfigurationSection("random");
+        if (randomSection != null) {
+            for (final String mat : randomSection.getKeys(false)) {
+                // Ensure double precision even if YAML treats it as string/int
+                random.put(mat, randomSection.getDouble(mat));
+            }
         }
 
         chances = new Double[random.size()];
@@ -76,9 +81,10 @@ public class Generator {
                     drops.put(drop, dropSection.getDouble(drop));
                 }
             } else {
-                for (final String drop : path.getConfigurationSection("drops").getKeys(false)) {
+                ConfigurationSection oldDrops = path.getConfigurationSection("drops");
+                for (final String drop : oldDrops.getKeys(false)) {
                     if (drop.equals("replace") || drop.equals("items")) continue;
-                    drops.put(drop, path.getDouble("drops." + drop));
+                    drops.put(drop, oldDrops.getDouble(drop));
                 }
             }
         }
@@ -120,11 +126,17 @@ public class Generator {
     }
 
     public BlockPlacer randomChance() {
-        final Double chance = ThreadLocalRandom.current().nextDouble(getTotalChance());
+        if (totalChance <= 0) return null;
+        final double chance = ThreadLocalRandom.current().nextDouble() * totalChance;
         int chosenBlock = Arrays.binarySearch(chances, chance);
         if (chosenBlock < 0) {
             chosenBlock = -(chosenBlock + 1);
         }
+
+        if (chosenBlock >= blockPlacers.length) {
+            chosenBlock = blockPlacers.length - 1;
+        }
+
         return blockPlacers[chosenBlock];
     }
 }

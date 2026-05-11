@@ -140,7 +140,7 @@ public class BlockBreakListener implements Listener {
         if (delay > 0) {
             OfflinePlayer owner = plugin.getUtils().getOwner(block.getLocation());
             if (owner != null) {
-                int level = plugin.getUpgradeManager().getUpgradeLevel(owner.getUniqueId(), "linhmach");
+                double level = plugin.getUpgradeManager().getUpgradeLevel(owner.getUniqueId(), "linhmach");
                 if (level > 0) {
                     double percentPerLevel = config.getDouble("upgrade-gui.upgrades.linhmach.percent_per_level", 5.0);
                     double speedFactor = 1.0 + (percentPerLevel * level / 100.0);

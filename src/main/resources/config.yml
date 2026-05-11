@@ -312,5 +312,9 @@ upgrade-gui:
       max_level: 6
       cost_base: 50000
       cost_step: 100000
+      use_level_costs: false
+      level_costs:
+        1: 2000
+        2: 5000
       commands:
       - "lp user %player% permission set oregen3.tier.%level%"

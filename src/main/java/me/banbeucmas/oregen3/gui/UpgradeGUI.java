@@ -23,6 +23,7 @@ public class UpgradeGUI implements InventoryHandler {
 
     private static final DecimalFormat FORMAT = new DecimalFormat("#,###");
     private static final DecimalFormat PERCENT_FORMAT = new DecimalFormat("0.##");
+    private static final DecimalFormat LEVEL_FORMAT = new DecimalFormat("0.##");
 
     private final Oregen3 plugin;
     private final Player player;
@@ -99,28 +100,26 @@ public class UpgradeGUI implements InventoryHandler {
         ItemStack item = xMat.parseItem();
         if (item == null) item = new ItemStack(Objects.requireNonNull(XMaterial.STONE.parseMaterial()));
 
-        int currentLevel = plugin.getUpgradeManager().getUpgradeLevel(islandOwnerUUID, upgradeId);
-        int maxLevel = sec.getInt("max_level", 10);
-        int costBase = sec.getInt("cost_base", 500);
-        int costStep = sec.getInt("cost_step", 1000);
-        double nextCost = currentLevel < maxLevel ? costBase + (long) costStep * currentLevel : -1;
+        double currentLevel = plugin.getUpgradeManager().getUpgradeLevel(islandOwnerUUID, upgradeId);
+        double maxLevel = sec.getDouble("max_level", 10);
+        double nextCost = currentLevel < maxLevel ? getUpgradeCost(sec, currentLevel) : -1;
         double balance = plugin.getEconomyHook().getBalance(player);
 
         String rawName = sec.getString("name", upgradeId);
         String name = ChatColor.translateAlternateColorCodes('&',
-                rawName.replace("{level}", String.valueOf(currentLevel))
-                        .replace("{max_level}", String.valueOf(maxLevel)));
+                rawName.replace("{level}", LEVEL_FORMAT.format(currentLevel))
+                        .replace("{max_level}", LEVEL_FORMAT.format(maxLevel)));
 
         List<String> loreRaw = sec.getStringList("lore");
         List<String> lore = new ArrayList<>();
         for (String line : loreRaw) {
             if (line.contains("{ores}")) {
-                int targetLevel = Math.min(currentLevel + 1, maxLevel);
-                String generatorId = "tier" + targetLevel;
+                double targetLevel = Math.min(currentLevel + 1, maxLevel);
+                String generatorId = "tier" + LEVEL_FORMAT.format(targetLevel);
                 if (upgradeId.equalsIgnoreCase("tier")) {
                     Generator gen = plugin.getDataManager().getGenerators().get(generatorId);
                     if (gen != null) {
-                        lore.add(ChatColor.translateAlternateColorCodes('&', "&7Các quặng sẽ xuất hiện ở Tier " + targetLevel + ":"));
+                        lore.add(ChatColor.translateAlternateColorCodes('&', "&7Các quặng sẽ xuất hiện ở Tier " + LEVEL_FORMAT.format(targetLevel) + ":"));
                         double total = gen.getTotalChance();
                         for (Map.Entry<String, Double> entry : gen.getRandom().entrySet()) {
                             double chance = (entry.getValue() / total) * 100;
@@ -141,8 +140,8 @@ public class UpgradeGUI implements InventoryHandler {
             }
 
             String processed = line
-                    .replace("{level}", String.valueOf(currentLevel))
-                    .replace("{max_level}", String.valueOf(maxLevel))
+                    .replace("{level}", LEVEL_FORMAT.format(currentLevel))
+                    .replace("{max_level}", LEVEL_FORMAT.format(maxLevel))
                     .replace("{cost}", nextCost < 0 ? "MAX" : FORMAT.format(nextCost))
                     .replace("{balance}", FORMAT.format(balance));
             
@@ -185,8 +184,8 @@ public class UpgradeGUI implements InventoryHandler {
     }
 
     private void handleUpgradeClick(String upgradeId, ConfigurationSection sec, ConfigurationSection guiSection) {
-        int currentLevel = plugin.getUpgradeManager().getUpgradeLevel(islandOwnerUUID, upgradeId);
-        int maxLevel = sec.getInt("max_level", 10);
+        double currentLevel = plugin.getUpgradeManager().getUpgradeLevel(islandOwnerUUID, upgradeId);
+        double maxLevel = sec.getDouble("max_level", 10);
 
         if (currentLevel >= maxLevel) {
             sendMsg("messages.upgrade.max-level");
@@ -198,8 +197,8 @@ public class UpgradeGUI implements InventoryHandler {
         if (upgradeId.equalsIgnoreCase("tier") && Bukkit.getPluginManager().isPluginEnabled("TuTienCore")) {
             try {
                 int playerRealm = TuTien.getApi().getRealmId(player.getUniqueId());
-                int nextTierLevel = currentLevel + 1;
-                Generator nextGen = plugin.getDataManager().getGenerators().get("tier" + nextTierLevel);
+                double nextTierLevel = currentLevel + 1;
+                Generator nextGen = plugin.getDataManager().getGenerators().get("tier" + LEVEL_FORMAT.format(nextTierLevel));
                 
                 if (nextGen != null && nextGen.getRealmRequired() > 0) {
                     if (playerRealm < nextGen.getRealmRequired()) {
@@ -214,9 +213,7 @@ public class UpgradeGUI implements InventoryHandler {
             } catch (Exception ignored) {}
         }
 
-        int costBase = sec.getInt("cost_base", 500);
-        int costStep = sec.getInt("cost_step", 1000);
-        double cost = costBase + (long) costStep * currentLevel;
+        double cost = getUpgradeCost(sec, currentLevel);
 
         if (!plugin.getEconomyHook().has(player, cost)) {
             double balance = plugin.getEconomyHook().getBalance(player);
@@ -230,13 +227,13 @@ public class UpgradeGUI implements InventoryHandler {
 
         plugin.getEconomyHook().withdraw(player, cost);
 
-        int newLevel = currentLevel + 1;
+        double newLevel = currentLevel + 1;
         plugin.getUpgradeManager().setUpgradeLevel(islandOwnerUUID, upgradeId, newLevel);
 
         List<String> commands = sec.getStringList("commands");
         for (String cmd : commands) {
             String finalCmd = cmd.replace("%player%", player.getName())
-                                 .replace("%level%", String.valueOf(newLevel));
+                                 .replace("%level%", LEVEL_FORMAT.format(newLevel));
             Bukkit.dispatchCommand(Bukkit.getConsoleSender(), finalCmd);
         }
 
@@ -245,7 +242,7 @@ public class UpgradeGUI implements InventoryHandler {
                    .replace("{level}", "").replace("{max_level}", "").trim()));
         String msg = plugin.getConfig().getString("messages.upgrade.success", "");
         msg = msg.replace("{upgrade}", upgradeName)
-                 .replace("{level}", String.valueOf(newLevel))
+                 .replace("{level}", LEVEL_FORMAT.format(newLevel))
                  .replace("{cost}", FORMAT.format(cost));
         player.sendMessage(plugin.getStringParser().getColoredPrefixString(msg, player));
 
@@ -267,6 +264,24 @@ public class UpgradeGUI implements InventoryHandler {
             if (slot < 0 || slot >= inventory.getSize()) continue;
             inventory.setItem(slot, buildUpgradeItem(key, sec));
         }
+    }
+
+    private double getUpgradeCost(ConfigurationSection sec, double currentLevel) {
+        int costBase = sec.getInt("cost_base", 500);
+        int costStep = sec.getInt("cost_step", 1000);
+        double defaultCost = costBase + (long) costStep * currentLevel;
+
+        if (!sec.getBoolean("use_level_costs", false)) {
+            return defaultCost;
+        }
+
+        ConfigurationSection levelCosts = sec.getConfigurationSection("level_costs");
+        if (levelCosts == null) {
+            return defaultCost;
+        }
+
+        int nextLevel = (int) Math.floor(currentLevel) + 1;
+        return levelCosts.getDouble(String.valueOf(nextLevel), defaultCost);
     }
 
     private void playSound(ConfigurationSection guiSection, boolean success) {

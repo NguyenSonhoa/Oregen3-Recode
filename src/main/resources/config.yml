@@ -58,7 +58,7 @@ hooks:
 global:
   useJavaAsyncScheduler: false
   listener:
-    asyncListener: false
+    asyncListener: true
   generators:
     check-regen:
       enabled: true

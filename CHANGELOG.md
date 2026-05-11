@@ -1,5 +1,13 @@
 # Changelog
 
+## 1.1.9 - 2026-05-11
+
+### Added
+- Added a countdown background option so the regeneration timer text can be shown with or without its text display background.
+
+### Fixed
+- Fixed countdown text fade-in not being visible on some server/client combinations by avoiding text opacity interpolation across the signed byte boundary.
+
 ## 1.1.8 - 2026-05-11
 
 ### Changed

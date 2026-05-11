@@ -61,7 +61,7 @@ dependencies {
 }
 
 group = "me.banbeucmas"
-version = "1.1.8"
+version = "1.1.9"
 java {
     toolchain.languageVersion.set(JavaLanguageVersion.of(21))
     sourceCompatibility = JavaVersion.VERSION_1_8

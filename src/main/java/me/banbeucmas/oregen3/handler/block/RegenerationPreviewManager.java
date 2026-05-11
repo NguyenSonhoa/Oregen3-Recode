@@ -4,6 +4,7 @@ import me.banbeucmas.oregen3.Oregen3;
 import me.banbeucmas.oregen3.handler.block.placer.BlockPlacer;
 import net.md_5.bungee.api.ChatColor;
 import org.bukkit.Bukkit;
+import org.bukkit.Color;
 import org.bukkit.Location;
 import org.bukkit.World;
 import org.bukkit.block.Block;
@@ -144,17 +145,17 @@ public class RegenerationPreviewManager {
         textDisplay.setInvulnerable(true);
         textDisplay.setPersistent(false);
         textDisplay.setSilent(true);
+        textDisplay.setVisibleByDefault(false);
         textDisplay.setBillboard(Display.Billboard.CENTER);
         textDisplay.setShadowed(true);
-        textDisplay.setDefaultBackground(false);
+        applyCountdownBackground(textDisplay);
         textDisplay.setSeeThrough(plugin.getConfig().getBoolean("global.generators.regeneration-preview.countdown.see-through", true));
         textDisplay.setAlignment(TextDisplay.TextAlignment.CENTER);
-        textDisplay.setInterpolationDuration(getCountdownInterpolationDuration());
+        textDisplay.setInterpolationDuration(0);
         textDisplay.setTeleportDuration(getCountdownTeleportDuration());
         textDisplay.setTransformation(createTextTransformation());
         applyTextFade(textDisplay, key, 0.0F);
         updateCountdownText(textDisplay, durationTicks);
-        hideTextFromAll(textDisplay);
         return textDisplay;
     }
 
@@ -235,6 +236,12 @@ public class RegenerationPreviewManager {
                 template.replace("{seconds}", formatSeconds(remainingTicks / 20.0D))));
     }
 
+    private void applyCountdownBackground(TextDisplay textDisplay) {
+        boolean background = plugin.getConfig().getBoolean("global.generators.regeneration-preview.countdown.background", false);
+        textDisplay.setDefaultBackground(background);
+        textDisplay.setBackgroundColor(background ? null : Color.fromARGB(0, 0, 0, 0));
+    }
+
     private void updateTextFade(TextDisplay textDisplay, Location key, int elapsedTicks) {
         int fadeDuration = Math.max(1, plugin.getConfig().getInt("global.generators.regeneration-preview.countdown.fade-duration", 10));
         float fadeProgress = Math.min(1.0F, elapsedTicks / (float) fadeDuration);
@@ -243,12 +250,22 @@ public class RegenerationPreviewManager {
 
     private void applyTextFade(TextDisplay textDisplay, Location key, float fadeProgress) {
         float clampedProgress = Math.max(0.0F, Math.min(1.0F, fadeProgress));
+        boolean fading = clampedProgress < 1.0F;
+        if (fading) {
+            textDisplay.setInterpolationDuration(0);
+        }
         textDisplay.teleport(getTextLocation(key, clampedProgress));
         textDisplay.setTextOpacity(toTextOpacity(clampedProgress));
+        if (!fading) {
+            textDisplay.setInterpolationDuration(getCountdownInterpolationDuration());
+        }
     }
 
     private byte toTextOpacity(float fadeProgress) {
-        return (byte) Math.round(255.0F * fadeProgress);
+        if (fadeProgress >= 1.0F) {
+            return -1;
+        }
+        return (byte) Math.max(0, Math.min(254, Math.round(255.0F * fadeProgress)));
     }
 
     private String formatSeconds(double seconds) {
@@ -331,12 +348,6 @@ public class RegenerationPreviewManager {
         double nextMin = Math.max(currentMin, first);
         double nextMax = Math.min(currentMax, second);
         return nextMax >= nextMin ? new double[] {nextMin, nextMax} : null;
-    }
-
-    private void hideTextFromAll(TextDisplay textDisplay) {
-        for (Player player : Bukkit.getOnlinePlayers()) {
-            hideTextFromPlayer(player, textDisplay);
-        }
     }
 
     private void removeTextDisplay(Location key, TextDisplay textDisplay) {
